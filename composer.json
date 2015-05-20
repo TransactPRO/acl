@@ -1,6 +1,9 @@
 {
     "name": "tpro/acl",
     "description": "Acl",
+    "require": {
+        "jeremykendall/slim-auth": "~0.0.7@alpha"
+    },
     "authors": [
         {
             "name": "Andrey Mironov",

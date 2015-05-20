@@ -1,6 +1,6 @@
 <?php
 
-namespace Pak\Classes\Acl\Resource;
+namespace TPro\Slim\Acl\Resource;
 
 /**
  * Class ResourceAccess represents user access rights to resource (route or block)
@@ -14,15 +14,6 @@ class ResourceAccess
 
     /** @var string Permitted actions */
     protected $privilege;
-
-    /* Possible access privileges */
-    const PRIVILEGE_READ = 'r';
-    const PRIVILEGE_WRITE = 'w';
-    const PRIVILEGE_NONE = '';
-
-    private $allowedPrivileges = [
-        self::PRIVILEGE_READ, self::PRIVILEGE_WRITE, self::PRIVILEGE_NONE
-    ];
 
     /**
      * @param string $name
@@ -55,10 +46,6 @@ class ResourceAccess
      */
     protected function setPrivilege($privilege)
     {
-        if (!in_array($privilege, $this->allowedPrivileges)) {
-            throw new \InvalidArgumentException("Privilege '$privilege' is not allowed");
-        }
-
         $this->privilege = $privilege;
     }
 

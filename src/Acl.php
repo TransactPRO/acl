@@ -1,8 +1,8 @@
 <?php
-namespace Pak\Classes\Acl;
+namespace TPro\Slim\Acl;
 
 use InvalidArgumentException;
-use Pak\Classes\Acl\Resource\ResourceAccess;
+use TPro\Slim\Acl\Resource\ResourceAccess;
 use Zend\Permissions\Acl\AclInterface;
 
 /**

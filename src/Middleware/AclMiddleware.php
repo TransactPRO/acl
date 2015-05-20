@@ -1,9 +1,10 @@
 <?php
 
-namespace Pak\Classes\Acl;
+namespace TPro\Slim\Acl\Middleware;
 
 use PDO;
 use Slim\Middleware;
+use TPro\Slim\Acl\Acl;
 use Zend\Authentication\AuthenticationService;
 
 /**
@@ -27,10 +28,31 @@ class AclMiddleware extends Middleware
     /** @var PDO */
     private $pdo;
 
-    public function __construct(PDO $pdo, Acl $acl)
+    private $settings = [
+        'guestRoleId' => 1
+    ];
+
+    public function __construct(PDO $pdo, Acl $acl, array $settings = [])
     {
         $this->pdo = $pdo;
         $this->acl = $acl;
+        $this->applySettings($settings);
+    }
+
+    /**
+     * @param array $settings
+     */
+    protected function applySettings(array $settings = [])
+    {
+        if (empty($settings)) return;
+
+        foreach ($settings as $setting => $value) {
+            if (!isset($this->settings[$setting])) {
+                throw new \InvalidArgumentException("Trying to set non-existing setting ($setting)");
+            }
+
+            $this->settings[$setting] = $value;
+        }
     }
 
     public function call()
@@ -53,9 +75,14 @@ class AclMiddleware extends Middleware
         $auth = $this->app->auth;
 
         return function () use ($router, $auth) {
-            // Get role if user is authorized or set to `guest` otherwise
             /** @var AuthenticationService $auth */
-            $role_id = $auth->getIdentity()['role'];
+            // Set role ID to default (guest) if user isn't authorized, otherwise get user role ID
+            $identity = $auth->getIdentity();
+            if (is_null($identity['role'])) {
+                $role_id = $this->settings['guestRoleId'];
+            } else {
+                $role_id = $auth->getIdentity()['role'];
+            }
 
             // Fetch route permissions
             $route_pattern = $router->getCurrentRoute()->getPattern();

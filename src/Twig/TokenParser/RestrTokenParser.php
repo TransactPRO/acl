@@ -1,11 +1,11 @@
 <?php
 
-namespace Pak\Classes\Acl\Twig\TokenParser;
+namespace TPro\Slim\Acl\Twig\TokenParser;
 
-use Pak\Classes\Acl\Acl;
-use Pak\Classes\Acl\Twig\Node\AccessNode;
-use Pak\Classes\Acl\Twig\Node\NoAccessNode;
-use Pak\Classes\Acl\Twig\Node\RestrNode;
+use TPro\Slim\Acl\Acl;
+use TPro\Slim\Acl\Twig\Node\AccessNode;
+use TPro\Slim\Acl\Twig\Node\NoAccessNode;
+use TPro\Slim\Acl\Twig\Node\RestrNode;
 use Twig_Node;
 use Twig_Token;
 use Twig_TokenParser;
