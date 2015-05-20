@@ -55,23 +55,22 @@ class AclMiddleware extends Middleware
         return function () use ($router, $auth) {
             // Get role if user is authorized or set to `guest` otherwise
             /** @var AuthenticationService $auth */
-            $roles = $auth->getIdentity()['role'] ?: 'guest';
+            $role_id = $auth->getIdentity()['role'];
 
             // Fetch route permissions
-            $route = $router->getCurrentRoute()->getPattern();
-            $route_permission = $this->fetchRoutePermission($route, $roles);
+            $route_pattern = $router->getCurrentRoute()->getPattern();
+            $route_access = $this->fetchRouteAccess($route_pattern, $role_id);
 
             // Allow route
-            $privilege = $route_permission['privilege'] ?: null;
-            $this->acl->setRouteResource($route_permission['route_pattern'], $privilege);
+            $privilege = $route_access['privilege'] ?: null;
+            $this->acl->setRouteResource($route_access['route_pattern'], $privilege);
 
             // Fetch block permissions
-            $route_permission_id = $route_permission['id'];
-            $block_permissions = $this->fetchBlockPermissions($route_permission_id, $roles);
+            $blocks_access = $this->fetchBlocksAccess($route_pattern, $role_id);
 
             // Allow blocks
-            foreach ($block_permissions as $permission) {
-                $this->acl->addBlockResource($permission['block_name'], $permission['privilege']);
+            foreach ($blocks_access as $access) {
+                $this->acl->addBlockResource($access['block_name'], $access['privilege']);
             }
         };
     }
@@ -79,19 +78,21 @@ class AclMiddleware extends Middleware
     /**
      * Fetches appropriate route permission for set of roles
      *
-     * Todo: check index for IN query
-     * Todo: what if there are multiple permissions for user roles found?
-     * @param $route
-     * @param array $roles
-     * @return bool|array
+     * @param string $route_pattern
+     * @param int $role_id
+     * @return array|bool
      */
-    protected function fetchRoutePermission($route, $roles)
+    protected function fetchRouteAccess($route_pattern, $role_id)
     {
-        $roles_str = $this->quoteRolesString($roles);
-
-        $query = $this->pdo->prepare("SELECT * FROM role_route_permission WHERE route_pattern = :route AND role IN ($roles_str)");
+        $sql = "SELECT route.id AS route_id, route.pattern AS route_pattern, rra.privilege AS privilege
+                FROM role
+                INNER JOIN role_route_access rra ON role.id = rra.role_id
+                INNER JOIN route ON route.id = rra.route_id
+                WHERE role.id = :role_id AND route.pattern = :route_pattern";
+        $query = $this->pdo->prepare($sql);
         $query->execute([
-            ':route' => $route,
+            ':route_pattern' => $route_pattern,
+            ':role_id' => $role_id,
         ]);
 
         return $query->fetch(PDO::FETCH_ASSOC);
@@ -100,16 +101,22 @@ class AclMiddleware extends Middleware
     /**
      * Fetches appropriate block permissions for set of roles
      *
-     * @param $route_permission_id
-     * @param $roles
+     * @param string $route_pattern
+     * @param int $role_id
      * @return array
      */
-    protected function fetchBlockPermissions($route_permission_id, $roles)
+    protected function fetchBlocksAccess($route_pattern, $role_id)
     {
-        $roles_str = $this->quoteRolesString($roles);
-
-        $query = $this->pdo->prepare("SELECT * FROM role_block_permission WHERE role_route_permission_id = :role_route_permission_id AND role IN ($roles_str)");
-        $query->execute([':role_route_permission_id' => $route_permission_id]);
+        $sql = "SELECT rba.block_name, rba.privilege
+                FROM role
+                INNER JOIN role_block_access rba ON role.id = rba.role_id
+                INNER JOIN route ON route.id = rba.route_id
+                WHERE route.pattern = :route_pattern AND role.id = :role_id";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([
+            ':route_pattern' => $route_pattern,
+            ':role_id' => $role_id
+        ]);
 
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -122,6 +129,7 @@ class AclMiddleware extends Middleware
      * into
      * "'guest','admin','superuser'"
      *
+     * @deprecated According to latest requirements there will be only single role attached to user
      * @param $roles_string
      * @return string
      */
