@@ -1,8 +1,8 @@
 <?php
 
-namespace TPro\Slim\Acl\Twig\TokenParser;
+namespace TPro\Acl\Twig\TokenParser;
 
-use TPro\Slim\Acl\Twig\Node\AccessNode;
+use TPro\Acl\Twig\Node\AccessNode;
 use Twig_Node;
 use Twig_Token;
 use Twig_TokenParser;

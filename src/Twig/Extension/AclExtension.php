@@ -1,11 +1,11 @@
 <?php
 
-namespace TPro\Slim\Acl\Twig\Extension;
+namespace TPro\Acl\Twig\Extension;
 
-use TPro\Slim\Acl\Acl;
-use TPro\Slim\Acl\Twig\TokenParser\AccessTokenParser;
-use TPro\Slim\Acl\Twig\TokenParser\NoAccessTokenParser;
-use TPro\Slim\Acl\Twig\TokenParser\RestrTokenParser;
+use TPro\Acl\Acl;
+use TPro\Acl\Twig\TokenParser\AccessTokenParser;
+use TPro\Acl\Twig\TokenParser\NoAccessTokenParser;
+use TPro\Acl\Twig\TokenParser\RestrTokenParser;
 use Twig_Extension;
 
 class AclExtension extends Twig_Extension

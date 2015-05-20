@@ -1,10 +1,10 @@
 <?php
 
-namespace TPro\Slim\Acl\Middleware;
+namespace TPro\Acl\Middleware;
 
 use PDO;
 use Slim\Middleware;
-use TPro\Slim\Acl\Acl;
+use TPro\Acl\Acl;
 use Zend\Authentication\AuthenticationService;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace TPro\Slim\Acl\Resource;
+namespace TPro\Acl\Resource;
 
 /**
  * Class ResourceAccess represents user access rights to resource (route or block)

@@ -10,5 +10,10 @@
             "email": "andrey.mironov@transactpro.lv"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "TPro\\Acl\\": "src/"
+        }
+    }
 }

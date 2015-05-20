@@ -1,6 +1,6 @@
 <?php
 
-namespace TPro\Slim\Acl\Twig\Node;
+namespace TPro\Acl\Twig\Node;
 
 use Twig_Node;
 
