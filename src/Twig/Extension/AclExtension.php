@@ -3,6 +3,8 @@
 namespace TPro\Acl\Twig\Extension;
 
 use TPro\Acl\Acl;
+use TPro\Acl\Twig\NodeWrapper\RestrTokenWrapper;
+use TPro\Acl\Twig\NodeWrapper\TokenWrapper;
 use TPro\Acl\Twig\TokenParser\AccessTokenParser;
 use TPro\Acl\Twig\TokenParser\NoAccessTokenParser;
 use TPro\Acl\Twig\TokenParser\RestrTokenParser;
@@ -10,10 +12,11 @@ use Twig_Extension;
 
 class AclExtension extends Twig_Extension
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $acl;
+
+    /** @var RestrTokenWrapper  */
+    protected $restrTokenWrapper;
 
     /**
      * @param Acl $acl
@@ -30,7 +33,7 @@ class AclExtension extends Twig_Extension
     public function getTokenParsers()
     {
         return [
-            new RestrTokenParser($this->acl),
+            new RestrTokenParser($this->acl, $this->getRestrTokenWrapper()),
             new AccessTokenParser(),
             new NoAccessTokenParser()
         ];
@@ -43,5 +46,21 @@ class AclExtension extends Twig_Extension
     public function getName()
     {
         return 'permissions';
+    }
+
+    /**
+     * @param RestrTokenWrapper $restrTokenWrapper
+     */
+    public function setRestrTokenWrapper(RestrTokenWrapper $restrTokenWrapper)
+    {
+        $this->restrTokenWrapper = $restrTokenWrapper;
+    }
+
+    /**
+     * @return RestrTokenWrapper
+     */
+    protected function getRestrTokenWrapper()
+    {
+        return $this->restrTokenWrapper;
     }
 }

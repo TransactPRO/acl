@@ -6,6 +6,8 @@ use TPro\Acl\Acl;
 use TPro\Acl\Twig\Node\AccessNode;
 use TPro\Acl\Twig\Node\NoAccessNode;
 use TPro\Acl\Twig\Node\RestrNode;
+use TPro\Acl\Twig\NodeWrapper\RestrTokenWrapper;
+use TPro\Acl\Twig\NodeWrapper\WrapperData\RestrWrapperData;
 use Twig_Node;
 use Twig_Token;
 use Twig_TokenParser;
@@ -30,12 +32,17 @@ class RestrTokenParser extends Twig_TokenParser
     /** @var Acl */
     protected $acl;
 
+    /** @var RestrTokenWrapper */
+    protected $wrapper;
+
     /**
      * @param Acl $acl
+     * @param RestrTokenWrapper $nodeWrapper
      */
-    public function __construct(Acl $acl)
+    public function __construct(Acl $acl, RestrTokenWrapper $nodeWrapper = null)
     {
         $this->acl = $acl;
+        $this->wrapper = $nodeWrapper;
     }
 
     /**
@@ -67,6 +74,7 @@ class RestrTokenParser extends Twig_TokenParser
                             $had_permission = true;
                         }
                     } catch (\Exception $e) {
+
                     }
                     break;
 
@@ -85,7 +93,14 @@ class RestrTokenParser extends Twig_TokenParser
         $stream->next();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        return new RestrNode($body);
+        /* Prepare wrapper data */
+        $wrapperData = null;
+        if (isset($this->wrapper)) {
+            $wrapperData = new RestrWrapperData();
+            $wrapperData->restrId = $restr_name;
+        }
+
+        return new RestrNode($body, $this->wrapper, $wrapperData);
     }
 
     /**
