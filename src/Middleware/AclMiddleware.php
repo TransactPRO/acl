@@ -84,7 +84,7 @@ class AclMiddleware extends Middleware
                 $role_id = $auth->getIdentity()['role'];
             }
 
-            // Fetch route permissions
+            // Fetch route permissions for current user
             $route_pattern = $router->getCurrentRoute()->getPattern();
             $route_access = $this->fetchRouteAccess($route_pattern, $role_id);
 

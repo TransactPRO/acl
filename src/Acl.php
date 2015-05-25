@@ -24,10 +24,10 @@ class Acl implements AclInterface
      * If permission for block is not specified then route permission is used.
      *
      * @param string $block_name
-     * @param string|array|null $privilege
+     * @param string|array $privilege
      * @return bool
      */
-    public function isBlockAllowed($block_name, $privilege = null)
+    public function isBlockAllowed($block_name, $privilege)
     {
         /* Use block permission if exists */
         if ($this->hasBlockResource($block_name)) {
@@ -55,7 +55,8 @@ class Acl implements AclInterface
      * Checks whether user has permission to route
      *
      * @param string $route_pattern
-     * @param string|array|null $privileges
+     * @param string|array|null $privileges Does not affect access permission to route.
+     *          Route privilege is only used as default permission for all child blocks.
      * @return bool
      */
     public function isRouteAllowed($route_pattern, $privileges = null)
