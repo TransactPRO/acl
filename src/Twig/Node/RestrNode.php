@@ -2,22 +2,22 @@
 
 namespace TPro\Acl\Twig\Node;
 
-use TPro\Acl\Twig\NodeWrapper\RestrTokenWrapper;
-use TPro\Acl\Twig\NodeWrapper\WrapperData\WrapperData;
+use Pak\Classes\AclRestrTokenWrapper;
+use TPro\Acl\Twig\TokenWrapper\Decorator\WrapperCompiler;
 use Twig_Compiler;
 use Twig_Node;
 
 class RestrNode extends Twig_Node
 {
-    protected $preOutputClosure;
-    protected $postOutputClosure;
-
-    public function __construct(Twig_Node $body, RestrTokenWrapper $wrapper = null, WrapperData $data)
+    /**
+     * @param Twig_Node $body
+     * @param AclRestrTokenWrapper $wrapper
+     */
+    public function __construct(Twig_Node $body, AclRestrTokenWrapper $wrapper = null)
     {
         parent::__construct(array('body' => $body));
 
         $this->wrapper = $wrapper;
-        $this->wrapperData = $data;
     }
 
     /**
@@ -25,17 +25,16 @@ class RestrNode extends Twig_Node
      */
     public function compile(Twig_Compiler $compiler)
     {
+        // Decorate manually if TokenWrapper is set
         if (isset($this->wrapper)) {
-            $this->wrapper->setCompiler($compiler);
-            $this->wrapper->beforeCompile($this->wrapperData);
+            $wrapperCompiler = new WrapperCompiler($this->wrapper, $compiler);
+            $wrapperCompiler->beforeCompile();
+
+            $compiler->subcompile($this->getNode('body'));
+
+            $wrapperCompiler->afterCompile();
+        } else {
+            $compiler->subcompile($this->getNode('body'));
         }
-
-        $compiler->subcompile($this->getNode('body'));
-
-        if (isset($this->wrapper)) {
-            $this->wrapper->afterCompile($this->wrapperData);
-        }
-
-        return;
     }
 }
