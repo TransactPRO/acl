@@ -1,0 +1,19 @@
+{
+    "name": "tpro/acl",
+    "description": "Acl",
+    "require": {
+        "jeremykendall/slim-auth": "~0.0.7@alpha"
+    },
+    "authors": [
+        {
+            "name": "Andrey Mironov",
+            "email": "andrey.mironov@transactpro.lv"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "TPro\\Acl\\": "src/"
+        }
+    }
+}

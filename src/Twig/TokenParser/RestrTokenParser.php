@@ -1,11 +1,13 @@
 <?php
 
-namespace Pak\Classes\Acl\Twig\TokenParser;
+namespace TPro\Acl\Twig\TokenParser;
 
-use Pak\Classes\Acl\Acl;
-use Pak\Classes\Acl\Twig\Node\AccessNode;
-use Pak\Classes\Acl\Twig\Node\NoAccessNode;
-use Pak\Classes\Acl\Twig\Node\RestrNode;
+use Pak\Classes\AclRestrTokenWrapper;
+use TPro\Acl\Acl;
+use TPro\Acl\Twig\Node\AccessNode;
+use TPro\Acl\Twig\Node\NoAccessNode;
+use TPro\Acl\Twig\Node\RestrNode;
+use TPro\Acl\Twig\TokenWrapper\Data\RestrWrapperData;
 use Twig_Node;
 use Twig_Token;
 use Twig_TokenParser;
@@ -30,12 +32,19 @@ class RestrTokenParser extends Twig_TokenParser
     /** @var Acl */
     protected $acl;
 
+    /** @var AclRestrTokenWrapper */
+    protected $wrapper;
+
+    protected $tokenId;
+
     /**
      * @param Acl $acl
+     * @param AclRestrTokenWrapper $nodeWrapper
      */
-    public function __construct(Acl $acl)
+    public function __construct(Acl $acl, AclRestrTokenWrapper $nodeWrapper = null)
     {
         $this->acl = $acl;
+        $this->wrapper = $nodeWrapper;
     }
 
     /**
@@ -47,7 +56,7 @@ class RestrTokenParser extends Twig_TokenParser
         $stream = $this->parser->getStream();
 
         /* Block name is mandatory */
-        $restr_name = $stream->expect(Twig_Token::STRING_TYPE)->getValue();
+        $this->tokenId = $stream->expect(Twig_Token::STRING_TYPE)->getValue();
 
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
         $body = $this->parser->subparse(array($this, 'decideForEnd'));
@@ -62,11 +71,12 @@ class RestrTokenParser extends Twig_TokenParser
                 case ($node instanceof AccessNode):
                     $node_permissions = $node->getAttribute('permissions');
                     try {
-                        if ($this->acl->isBlockAllowed($restr_name, $node_permissions)) {
+                        if ($this->acl->isBlockAllowed($this->tokenId, $node_permissions)) {
                             $node->enable();
                             $had_permission = true;
                         }
                     } catch (\Exception $e) {
+
                     }
                     break;
 
@@ -85,7 +95,15 @@ class RestrTokenParser extends Twig_TokenParser
         $stream->next();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        return new RestrNode($body);
+        /* Prepare wrapper data */
+        if (isset($this->wrapper)) {
+            $wrapperData = new RestrWrapperData();
+            $wrapperData->restrId = $this->tokenId;
+
+            $this->wrapper->setData($wrapperData);
+        }
+
+        return new RestrNode($body, $this->wrapper);
     }
 
     /**

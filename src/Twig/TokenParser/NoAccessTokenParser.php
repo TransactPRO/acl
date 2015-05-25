@@ -1,8 +1,8 @@
 <?php
 
-namespace Pak\Classes\Acl\Twig\TokenParser;
+namespace TPro\Acl\Twig\TokenParser;
 
-use Pak\Classes\Acl\Twig\Node\NoAccessNode;
+use TPro\Acl\Twig\Node\NoAccessNode;
 use Twig_Node;
 use Twig_Token;
 use Twig_TokenParser;
