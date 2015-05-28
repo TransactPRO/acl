@@ -111,10 +111,10 @@ class AclMiddleware extends Middleware
      */
     protected function fetchRouteAccess($route_pattern, $role_id)
     {
-        $sql = "SELECT route.id AS route_id, route.pattern AS route_pattern, rra.privilege AS privilege
+        $sql = "SELECT route.route_id, route.pattern AS route_pattern, rra.privilege AS privilege
                 FROM role
                 INNER JOIN role_route_access rra ON role.id = rra.role_id
-                INNER JOIN route ON route.id = rra.route_id
+                INNER JOIN route ON route.route_id = rra.route_id
                 WHERE role.id = :role_id AND route.pattern = :route_pattern";
         $query = $this->pdo->prepare($sql);
         $query->execute([
@@ -137,7 +137,7 @@ class AclMiddleware extends Middleware
         $sql = "SELECT rba.block_name, rba.privilege
                 FROM role
                 INNER JOIN role_block_access rba ON role.id = rba.role_id
-                INNER JOIN route ON route.id = rba.route_id
+                INNER JOIN route ON route.route_id = rba.route_id
                 WHERE route.pattern = :route_pattern AND role.id = :role_id";
         $query = $this->pdo->prepare($sql);
         $query->execute([
